@@ -4,8 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EchoSession</title>
+    <title>EchoSession | Neural Interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            /* Brighter, more vibrant gradient */
+            --primary-gradient: linear-gradient(135deg, #a100ff 0%, #ff00cc 100%);
+            /* Lighter glass for "Frosted" look */
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.85);
+            /* Increased contrast */
+            --neon-glow: 0 0 25px rgba(255, 0, 204, 0.4);
+            --accent-cyan: #00f2ff;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,149 +30,176 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Outfit', sans-serif;
+            background: url('bg.png') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: var(--text-primary);
+            overflow: auto;
+            /* Allow scrolling if height exceeds viewport */
             padding: 20px;
         }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 800px;
+        /* Reduced opacity overlay to show more background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 25, 0.4);
+            /* Significantly reduced opacity from 0.6 */
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
             width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+        }
+
+        .main-container {
+            background: rgba(30, 30, 50, 0.5);
+            /* Lighter/more transparent background */
+            backdrop-filter: blur(12px);
+            /* Slightly less blur for clarity */
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Subtle inner glow */
+        .main-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 26px;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(225, 0, 255, 0.4));
+            letter-spacing: 0.5px;
         }
 
-        .header p {
-            opacity: 0.9;
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 14px;
+            color: var(--text-secondary);
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            transition: 0.3s;
         }
 
-        .connection-panel {
-            padding: 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
         }
 
-        .connection-panel.connected {
-            background: #d4edda;
-        }
-
-        .connection-panel.disconnected {
-            background: #f8d7da;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
+        .feature-icon {
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
             font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 30px;
             font-size: 12px;
-            font-weight: 600;
-            margin-top: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
-        .status.connected {
-            background: #28a745;
-            color: white;
+        .status-badge.connected {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
-        .status.disconnected {
-            background: #dc3545;
-            color: white;
+        .status-badge.disconnected {
+            background: rgba(255, 82, 82, 0.15);
+            color: #ff5252;
+            border: 1px solid rgba(255, 82, 82, 0.4);
         }
 
         .chat-container {
-            height: 400px;
+            flex: 1;
             overflow-y: auto;
             padding: 30px;
-            background: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            scroll-behavior: smooth;
         }
 
-        .message {
-            margin-bottom: 20px;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
+        /* Improved Message Styling */
+        @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(15px);
             }
 
             to {
@@ -164,155 +208,258 @@
             }
         }
 
+        .message {
+            max-width: 85%;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
         .message.user {
-            text-align: right;
+            align-self: flex-end;
+        }
+
+        .message.ai {
+            align-self: flex-start;
         }
 
         .message-content {
-            display: inline-block;
-            padding: 12px 18px;
-            border-radius: 18px;
-            max-width: 70%;
-            word-wrap: break-word;
+            padding: 16px 24px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            position: relative;
+            backdrop-filter: blur(5px);
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 5px 20px rgba(161, 0, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .message.ai .message-content {
-            background: #f1f3f4;
-            color: #333;
+            background: rgba(255, 255, 255, 0.12);
+            /* Brighter message bubbles */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-bottom-left-radius: 4px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .message.system .message-content {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .message.error .message-content {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            color: #00f2ff;
+            font-size: 13px;
+            align-self: center;
+            border-radius: 30px;
+            padding: 6px 20px;
+            margin: 10px 0;
         }
 
         .typing-indicator {
-            display: none;
-            padding: 10px;
-            color: #666;
+            padding: 0 30px;
+            font-size: 13px;
+            color: var(--accent-cyan);
             font-style: italic;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            margin-bottom: 10px;
         }
 
         .typing-indicator.active {
-            display: block;
+            opacity: 1;
         }
 
-        .input-panel {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .message-input-group {
+        .input-area {
+            padding: 25px 30px;
+            background: rgba(0, 0, 0, 0.15);
+            border-top: 1px solid var(--glass-border);
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .message-input-group input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .message-input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .function-demo {
-            margin-top: 15px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
-        .function-demo h4 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .function-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn-small {
-            padding: 8px 15px;
-            font-size: 12px;
-            background: #6c757d;
+        .glass-input {
+            background: rgba(255, 255, 255, 0.08);
+            /* Lighter input background */
+            border: 1px solid var(--glass-border);
             color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 15px;
+            transition: all 0.3s ease;
         }
 
-        .btn-small:hover {
-            background: #5a6268;
+        .glass-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 0, 204, 0.5);
+            box-shadow: 0 0 20px rgba(255, 0, 204, 0.2);
+        }
+
+        .message-box {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 0 20px rgba(161, 0, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(161, 0, 255, 0.6);
+            filter: brightness(1.1);
+        }
+
+        .tag-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tag-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 900px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .main-container {
+                height: 80vh;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            opacity: 0.9;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>EchoSession</h1>
-            <p>WebSocket AI Chat</p>
-        </div>
-
-        <div class="connection-panel" id="connectionPanel">
-            <div class="input-group">
-                <label for="userId">User ID:</label>
-                <input type="text" id="userId" placeholder="Enter your user ID" value="user_demo_001">
+    <div class="layout-grid">
+        <!-- Main Chat Interface -->
+        <div class="main-container">
+            <div class="header">
+                <div>
+                    <h1>EchoSession</h1>
+                    <p>Neural Interface v2.0</p>
+                </div>
+                <div id="statusBadge" class="status-badge disconnected">Offline</div>
             </div>
-            <div class="input-group">
-                <label for="sessionId">Session ID (UUID):</label>
-                <input type="text" id="sessionId" placeholder="Auto-generated UUID" readonly>
-            </div>
-            <button class="btn btn-primary" id="connectBtn" onclick="connect()">Connect to Session</button>
-            <button class="btn btn-danger" id="disconnectBtn" onclick="disconnect()"
-                style="display: none;">Disconnect</button>
-            <div class="status disconnected" id="status">Disconnected</div>
-        </div>
 
-        <div class="chat-container" id="chatContainer">
-            <div class="message system">
-                <div class="message-content">
-                    Click "Connect to Session" to start.
+            <div class="chat-container" id="chatContainer">
+                <div class="message system">
+                    <div class="message-content">Welcome to EchoSession! Click "Initialize" to connect. How can I help
+                        you today?</div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">Neural Engine Processing...</div>
+
+            <div class="input-area">
+                <div class="message-box">
+                    <input type="text" id="messageInput" class="glass-input" style="flex:1;"
+                        placeholder="Enter command or message..." disabled>
+                    <button class="btn btn-primary" id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+                </div>
+                <div class="function-buttons"
+                    style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:5px;">
+                    <button class="tag-btn" onclick="callFunction('get_weather')">/weather</button>
+                    <button class="tag-btn" onclick="callFunction('get_user_info')">/user_info</button>
+                    <button class="tag-btn" onclick="callFunction('search_database')">/db_search</button>
                 </div>
             </div>
         </div>
 
-        <div class="typing-indicator" id="typingIndicator">AI is typing...</div>
-
-        <div class="input-panel">
-            <div class="message-input-group">
-                <input type="text" id="messageInput" placeholder="Type your message..." disabled>
-                <button class="btn btn-primary" id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+        <!-- Sidebar / Features Panel -->
+        <div class="sidebar">
+            <div>
+                <div class="section-title">Connection</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <input type="text" id="userId" class="glass-input" placeholder="User ID" value="User_Alpha">
+                    <input type="text" id="sessionId" class="glass-input" placeholder="Session UUID">
+                    <button class="btn btn-primary" id="connectBtn" onclick="connect()"
+                        style="width:100%;">Initialize</button>
+                    <button class="btn btn-danger" id="disconnectBtn" onclick="disconnect()"
+                        style="display:none; width:100%; background:rgba(255,50,50,0.2); color:#ff5252; border:1px solid rgba(255,50,50,0.4);">Terminate</button>
+                </div>
             </div>
 
-            <div class="function-demo">
-                <h4>Function Calling Demo:</h4>
-                <div class="function-buttons">
-                    <button class="btn-small" onclick="callFunction('get_weather')">Get Weather</button>
-                    <button class="btn-small" onclick="callFunction('get_user_info')">Get User Info</button>
-                    <button class="btn-small" onclick="callFunction('search_database')">Search Database</button>
-                </div>
+            <div style="margin-top:20px;">
+                <div class="section-title">System Features</div>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <div class="feature-icon" style="color:#00f2ff;">⚡</div>
+                        <div>
+                            <strong>Real-time WebSocket</strong>
+                            <div style="font-size:12px; opacity:0.7;">Zero-latency bi-directional comms</div>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon" style="color:#e100ff;">🧠</div>
+                        <div>
+                            <strong>Llama 3.3 Intelligence</strong>
+                            <div style="font-size:12px; opacity:0.7;">Powered by Groq Inference Engine</div>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon" style="color:#00ff88;">💾</div>
+                        <div>
+                            <strong>Session Persistence</strong>
+                            <div style="font-size:12px; opacity:0.7;">Supabase Vector Storage</div>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon" style="color:#ffcc00;">🛠️</div>
+                        <div>
+                            <strong>Function Calling</strong>
+                            <div style="font-size:12px; opacity:0.7;">Native tool execution demo</div>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -322,7 +469,6 @@
         let currentSessionId = null;
         let currentAiMessage = null;
 
-        // Generate UUID
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = Math.random() * 16 | 0;
@@ -331,31 +477,47 @@
             });
         }
 
-        // Initialize session ID on page load
         window.onload = function () {
-            document.getElementById('sessionId').value = generateUUID();
+            // Check for session_id in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSessionId = urlParams.get('session_id');
+
+            if (urlSessionId) {
+                document.getElementById('sessionId').value = urlSessionId;
+            } else {
+                document.getElementById('sessionId').value = generateUUID();
+            }
         };
 
         function connect() {
-            // Generate a new session ID for each connection
-            document.getElementById('sessionId').value = generateUUID();
+            let sessionId = document.getElementById('sessionId').value;
+            if (!sessionId) {
+                sessionId = generateUUID();
+                document.getElementById('sessionId').value = sessionId;
+            }
 
             const userId = document.getElementById('userId').value;
-            const sessionId = document.getElementById('sessionId').value;
 
-            if (!userId || !sessionId) {
-                alert('Please enter both User ID and Session ID');
+            // Update URL to include session_id for easy sharing
+            const newUrl = `${window.location.pathname}?session_id=${sessionId}`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+
+            if (!userId) {
+                alert('Connection parameters missing.');
                 return;
             }
 
             currentSessionId = sessionId;
-            const wsUrl = `ws://localhost:8000/ws/session/${sessionId}?user_id=${userId}`;
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/session/${sessionId}?user_id=${userId}`;
+
+            addMessage('system', 'Establishing Neural Link...');
 
             ws = new WebSocket(wsUrl);
 
             ws.onopen = function () {
                 updateConnectionStatus(true);
-                addMessage('system', 'Connected');
+                addMessage('system', 'Link Established. Neural Interface Active.');
             };
 
             ws.onmessage = function (event) {
@@ -365,12 +527,12 @@
 
             ws.onerror = function (error) {
                 console.error('WebSocket error:', error);
-                addMessage('error', 'Connection error occurred');
+                addMessage('error', 'Link Synchronization Error');
             };
 
             ws.onclose = function () {
                 updateConnectionStatus(false);
-                addMessage('system', 'Disconnected from session');
+                addMessage('system', 'Link Terminated');
             };
         }
 
@@ -387,26 +549,24 @@
 
             if (!message || !ws) return;
 
-            // Send message to server
             ws.send(JSON.stringify({
                 type: 'user_message',
                 content: message
             }));
 
-            // Display user message
-            addMessage('user', message);
+            // Don't add message locally - wait for server broadcast
+            // addMessage('user', message);
             input.value = '';
         }
 
         function callFunction(functionName) {
             if (!ws) {
-                alert('Please connect to a session first');
+                alert('Initialize link first.');
                 return;
             }
-
             const functionMessage = `/function ${functionName} {}`;
             ws.send(functionMessage);
-            addMessage('user', `[Function Call: ${functionName}]`);
+            addMessage('user', `Executing Tool: ${functionName}`);
         }
 
         function handleMessage(data) {
@@ -416,28 +576,28 @@
                 case 'system':
                     addMessage('system', content);
                     break;
-
+                case 'user_message':
+                    addMessage('user', content);
+                    break;
                 case 'ai_response_chunk':
                     if (!currentAiMessage) {
                         currentAiMessage = addMessage('ai', content);
                     } else {
                         currentAiMessage.textContent += content;
+                        const chatContainer = document.getElementById('chatContainer');
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
                     }
                     break;
-
                 case 'ai_response_complete':
                     currentAiMessage = null;
                     break;
-
                 case 'typing':
                     const typingIndicator = document.getElementById('typingIndicator');
                     typingIndicator.classList.toggle('active', content);
                     break;
-
                 case 'function_result':
-                    addMessage('system', `Function ${data.function} result: ${data.result.result}`);
+                    addMessage('system', `Result [${data.function}]: ${data.result.result}`);
                     break;
-
                 case 'error':
                     addMessage('error', content);
                     break;
@@ -461,33 +621,29 @@
         }
 
         function updateConnectionStatus(connected) {
-            const panel = document.getElementById('connectionPanel');
-            const status = document.getElementById('status');
+            const statusBadge = document.getElementById('statusBadge');
             const connectBtn = document.getElementById('connectBtn');
             const disconnectBtn = document.getElementById('disconnectBtn');
             const messageInput = document.getElementById('messageInput');
             const sendBtn = document.getElementById('sendBtn');
 
             if (connected) {
-                panel.className = 'connection-panel connected';
-                status.className = 'status connected';
-                status.textContent = 'Connected';
+                statusBadge.className = 'status-badge connected';
+                statusBadge.textContent = 'Online';
                 connectBtn.style.display = 'none';
-                disconnectBtn.style.display = 'inline-block';
+                disconnectBtn.style.display = 'block';
                 messageInput.disabled = false;
                 sendBtn.disabled = false;
             } else {
-                panel.className = 'connection-panel disconnected';
-                status.className = 'status disconnected';
-                status.textContent = 'Disconnected';
-                connectBtn.style.display = 'inline-block';
+                statusBadge.className = 'status-badge disconnected';
+                statusBadge.textContent = 'Offline';
+                connectBtn.style.display = 'block';
                 disconnectBtn.style.display = 'none';
                 messageInput.disabled = true;
                 sendBtn.disabled = true;
             }
         }
 
-        // Allow Enter key to send message
         document.getElementById('messageInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 sendMessage();

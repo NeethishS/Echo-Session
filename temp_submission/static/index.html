@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoSession</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .connection-panel {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .connection-panel.connected {
+            background: #d4edda;
+        }
+
+        .connection-panel.disconnected {
+            background: #f8d7da;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status.connected {
+            background: #28a745;
+            color: white;
+        }
+
+        .status.disconnected {
+            background: #dc3545;
+            color: white;
+        }
+
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 30px;
+            background: #fff;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message.ai .message-content {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .message.system .message-content {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .message.error .message-content {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .input-panel {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .message-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .message-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .function-demo {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .function-demo h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .function-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-small:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>EchoSession</h1>
+            <p>WebSocket AI Chat</p>
+        </div>
+
+        <div class="connection-panel" id="connectionPanel">
+            <div class="input-group">
+                <label for="userId">User ID:</label>
+                <input type="text" id="userId" placeholder="Enter your user ID" value="user_demo_001">
+            </div>
+            <div class="input-group">
+                <label for="sessionId">Session ID (UUID):</label>
+                <input type="text" id="sessionId" placeholder="Auto-generated UUID" readonly>
+            </div>
+            <button class="btn btn-primary" id="connectBtn" onclick="connect()">Connect to Session</button>
+            <button class="btn btn-danger" id="disconnectBtn" onclick="disconnect()"
+                style="display: none;">Disconnect</button>
+            <div class="status disconnected" id="status">Disconnected</div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message system">
+                <div class="message-content">
+                    Click "Connect to Session" to start.
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">AI is typing...</div>
+
+        <div class="input-panel">
+            <div class="message-input-group">
+                <input type="text" id="messageInput" placeholder="Type your message..." disabled>
+                <button class="btn btn-primary" id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+            </div>
+
+            <div class="function-demo">
+                <h4>Function Calling Demo:</h4>
+                <div class="function-buttons">
+                    <button class="btn-small" onclick="callFunction('get_weather')">Get Weather</button>
+                    <button class="btn-small" onclick="callFunction('get_user_info')">Get User Info</button>
+                    <button class="btn-small" onclick="callFunction('search_database')">Search Database</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let currentSessionId = null;
+        let currentAiMessage = null;
+
+        // Generate UUID
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Initialize session ID on page load
+        window.onload = function () {
+            document.getElementById('sessionId').value = generateUUID();
+        };
+
+        function connect() {
+            // Generate a new session ID for each connection
+            document.getElementById('sessionId').value = generateUUID();
+
+            const userId = document.getElementById('userId').value;
+            const sessionId = document.getElementById('sessionId').value;
+
+            if (!userId || !sessionId) {
+                alert('Please enter both User ID and Session ID');
+                return;
+            }
+
+            currentSessionId = sessionId;
+            const wsUrl = `ws://localhost:8000/ws/session/${sessionId}?user_id=${userId}`;
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function () {
+                updateConnectionStatus(true);
+                addMessage('system', 'Connected');
+            };
+
+            ws.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                handleMessage(data);
+            };
+
+            ws.onerror = function (error) {
+                console.error('WebSocket error:', error);
+                addMessage('error', 'Connection error occurred');
+            };
+
+            ws.onclose = function () {
+                updateConnectionStatus(false);
+                addMessage('system', 'Disconnected from session');
+            };
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message || !ws) return;
+
+            // Send message to server
+            ws.send(JSON.stringify({
+                type: 'user_message',
+                content: message
+            }));
+
+            // Display user message
+            addMessage('user', message);
+            input.value = '';
+        }
+
+        function callFunction(functionName) {
+            if (!ws) {
+                alert('Please connect to a session first');
+                return;
+            }
+
+            const functionMessage = `/function ${functionName} {}`;
+            ws.send(functionMessage);
+            addMessage('user', `[Function Call: ${functionName}]`);
+        }
+
+        function handleMessage(data) {
+            const { type, content } = data;
+
+            switch (type) {
+                case 'system':
+                    addMessage('system', content);
+                    break;
+
+                case 'ai_response_chunk':
+                    if (!currentAiMessage) {
+                        currentAiMessage = addMessage('ai', content);
+                    } else {
+                        currentAiMessage.textContent += content;
+                    }
+                    break;
+
+                case 'ai_response_complete':
+                    currentAiMessage = null;
+                    break;
+
+                case 'typing':
+                    const typingIndicator = document.getElementById('typingIndicator');
+                    typingIndicator.classList.toggle('active', content);
+                    break;
+
+                case 'function_result':
+                    addMessage('system', `Function ${data.function} result: ${data.result.result}`);
+                    break;
+
+                case 'error':
+                    addMessage('error', content);
+                    break;
+            }
+        }
+
+        function addMessage(type, content) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            return contentDiv;
+        }
+
+        function updateConnectionStatus(connected) {
+            const panel = document.getElementById('connectionPanel');
+            const status = document.getElementById('status');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+
+            if (connected) {
+                panel.className = 'connection-panel connected';
+                status.className = 'status connected';
+                status.textContent = 'Connected';
+                connectBtn.style.display = 'none';
+                disconnectBtn.style.display = 'inline-block';
+                messageInput.disabled = false;
+                sendBtn.disabled = false;
+            } else {
+                panel.className = 'connection-panel disconnected';
+                status.className = 'status disconnected';
+                status.textContent = 'Disconnected';
+                connectBtn.style.display = 'inline-block';
+                disconnectBtn.style.display = 'none';
+                messageInput.disabled = true;
+                sendBtn.disabled = true;
+            }
+        }
+
+        // Allow Enter key to send message
+        document.getElementById('messageInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+
+</html>

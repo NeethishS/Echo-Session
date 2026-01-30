@@ -56,15 +56,6 @@ class LLMService:
             Chunks of the LLM response
         """
         try:
-            # Add default friendly system prompt if none provided
-            if not system_prompt:
-                system_prompt = (
-                    "You are a friendly, helpful AI assistant. "
-                    "Be warm, conversational, and supportive in your responses. "
-                    "Provide clear, concise answers while maintaining a positive and encouraging tone. "
-                    "If you don't know something, be honest but helpful in suggesting alternatives."
-                )
-            
             history = self.get_or_create_chat(session_id, system_prompt)
             
             # Add user message to history
